@@ -11,6 +11,214 @@
 // * 1300K: The 'microchannel' higher tech carbon filament tube radiators that can handle more heat.
 
 
+// Scale curve for OPT power spheres
+// key = 1 1 0 2.5
+// key = 2 6
+// key = 3 17 15 11
+
+
+OPT_SH_PWR:NEEDS[SystemHeat]
+{
+	MODULE
+	{
+		name = FusionReactor
+
+		//StartActionName = #LOC_FFT_fusion-reactor_StartAction
+		//StopActionName = #LOC_FFT_fusion-reactor_StopAction
+		//ToggleActionName = #LOC_FFT_fusion-reactor_ToggleAction
+
+		// General Parameters
+		Enabled = False
+		MinimumReactorPower = 0.1
+
+		// Charge Parameters
+		Charged = false
+		ChargeRate = 10
+		ChargeAmount = 0
+		ChargeGoal = 900
+
+		// Animation Parameters
+		// ChargingLightRootTransformName = Lights_Charging
+		// OnLightTransformName = Light_On
+		// OffLightTransformName = Light_Off
+		// ModeLightTransformName = Light_FuelMode
+		// OverheatColorChangerName = ""
+
+		// Thermal Parameters
+		// must be unique
+		ModuleID = fusionreactor
+		// ModuleSystemHeat to link to
+		HeatModuleID = reactor
+
+		SystemPower = 500
+		// The shutdown temperature of the part
+		ShutdownTemperature = 1800
+		// The temperature the system contributes to loops
+		SystemOutletTemperature = 1000
+
+		FUSIONMODE
+		{
+			DisplayName = Dark Goo
+			ModeID = DarkGoo
+			ModeColor = 0.8, 0.8, 0.8, 0.5
+			PowerGeneration = 900
+			INPUT_RESOURCE
+			{
+				ResourceName = DarkGoo
+				Ratio = 0.00045
+				FlowMode = STAGE_PRIORITY_FLOW
+			}
+		}
+		FUSIONMODE
+		{
+			DisplayName = LqdHydrogen
+			ModeID = DarkGoo
+			ModeColor = 0.8, 0.8, 0.8, 0.5
+			PowerGeneration = 900
+			INPUT_RESOURCE
+			{
+				ResourceName = LqdHydrogen
+				Ratio = 0.002858151
+				FlowMode = STAGE_PRIORITY_FLOW
+			}
+		}
+		FUSIONMODE
+		{
+			DisplayName = D-D 
+			ModeID = Deuterium
+			ModeColor = 0.388, 0.968, 1.0, 0.5
+			PowerGeneration = 900
+			INPUT_RESOURCE
+			{
+				ResourceName = LqdDeuterium
+				Ratio = 0.00124692
+				FlowMode = STAGE_PRIORITY_FLOW
+			}
+		}
+		FUSIONMODE
+		{
+			DisplayName = D+He3
+			ModeID = DH3
+			ModeColor = 0.03, 0.45, 0.36, 0.5
+			PowerGeneration = 900
+			INPUT_RESOURCE
+			{
+				ResourceName = LqdDeuterium
+				Ratio = 0.00062346
+				FlowMode = STAGE_PRIORITY_FLOW
+			}
+			INPUT_RESOURCE
+			{
+				ResourceName = LqdHe3
+				Ratio = 0.003432204
+				FlowMode = STAGE_PRIORITY_FLOW
+			}
+		}
+		FUSIONMODE
+		{
+			DisplayName = LH2+AM
+			ModeID = MAM
+			ModeColor = 0.03, 0.45, 0.36, 0.5
+			PowerGeneration = 900
+			INPUT_RESOURCE
+			{
+				ResourceName = LqdHydrogen
+				Ratio = 0.00124692
+				FlowMode = STAGE_PRIORITY_FLOW
+			}
+			INPUT_RESOURCE
+			{
+				ResourceName = Antimatter
+				Ratio = 0.00062346
+				FlowMode = STAGE_PRIORITY_FLOW
+			}
+		}
+	}
+}
+OPT_SH_ENG:NEEDS[SystemHeat]
+{
+	MODULE
+	{
+		name = ModuleSystemHeatEngine
+		moduleID = turbojet
+		systemHeatModuleID = engine
+		engineModuleID = basic
+		systemPower = 30
+		shutdownTemperature = 1200
+		systemOutletTemperature = 700
+		temperatureCurve
+		{
+			key = 0 1.0
+			key = 700 1.0
+			key = 1200 0.0
+		}
+	}	
+	MODULE
+	{
+		name = ModuleSystemHeatEngine
+		moduleID = ntr
+		systemHeatModuleID = engine
+		engineModuleID = basic
+		systemPower = 200
+		shutdownTemperature = 1500
+		systemOutletTemperature = 1000
+		temperatureCurve
+		{
+			key = 0 1.0
+			key = 1000 1.0
+			key = 1400 0.0
+		}
+	}
+	MODULE
+	{
+		name = ModuleSystemHeatEngine
+		moduleID = scoop
+		systemHeatModuleID = engine
+		engineModuleID = basic
+		systemPower = 500
+		shutdownTemperature = 1800
+		systemOutletTemperature = 1200
+		temperatureCurve
+		{
+			key = 0 1.0
+			key = 1200 1.0
+			key = 1800 0.0
+		}
+	}
+	MODULE
+	{
+		name = ModuleSystemHeatEngine
+		moduleID = warpjet
+		systemHeatModuleID = engine
+		engineModuleID = basic
+		systemPower = 600
+		shutdownTemperature = 1800
+		systemOutletTemperature = 1400
+		temperatureCurve
+		{
+			key = 0 1.0
+			key = 1400 1.0
+			key = 2000 0.0
+		}
+	}
+	MODULE
+	{
+		name = ModuleSystemHeatEngine
+		moduleID = blackhole
+		systemHeatModuleID = engine
+		engineModuleID = basic
+		systemPower = 4000
+		shutdownTemperature = 1800
+		systemOutletTemperature = 1400
+		temperatureCurve
+		{
+			key = 0 1.0
+			key = 1400 1.0
+			key = 2000 0.0
+		}
+	}
+}
+
 
 // - - - - Fuselages - - - -
 
@@ -285,6 +493,10 @@
 
 @PART[opt_nebula_engine]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],1
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
@@ -293,302 +505,362 @@
 		moduleID = engine
 		iconName = Icon_Engine
 	}
-	MODULE
+	// #@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[turbojet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	// @MODULE[ModuleSystemHeatEngine],0
+	// {
+		// @engineModuleID = Turbojet
+	// }
+	@MODULE[ModuleSystemHeatEngine],0
 	{
-		name = ModuleSystemHeatEngine
-		// must be unique
-		moduleID = scoop
-		// ModuleSystemHeat to link to
-		systemHeatModuleID = engine
-		engineModuleID = Shcramjet
-		// in KW at peak output
-		// LV-N has ~240 MW jet power, non-rejectable heat can be this much
-		systemPower = 200
-		shutdownTemperature = 1500
-		// Nominal system output temperature
-		systemOutletTemperature = 1000
-		// Valid system temperature range
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		// @moduleID = scoop
+		@engineModuleID = Shcramjet
 	}
 }
 @PART[arie73]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
-	MODULE
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[ntr]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[ntr]] {}
+	@MODULE[ModuleSystemHeatEngine],0
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr1
-		systemHeatModuleID = engine
-		engineModuleID = Air-augmented
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		@moduleID = ntr1
+		@engineModuleID = Air-augmented
 	}
-	MODULE
+	@MODULE[ModuleSystemHeatEngine],1
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr2
-		systemHeatModuleID = engine
-		engineModuleID = Standard
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		@moduleID = ntr2
+		@engineModuleID = Standard
 	}
 }
-@PART[arie73|opt_vtol_lpr2]:NEEDS[SystemHeat]
+@PART[AAengine]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	@MODULE[ModuleSystemHeatEngine],0
+	{
+		@moduleID = scoop1
+		@engineModuleID = Air-augmented
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@moduleID = scoop2
+		@engineModuleID = Standard
+	}
+}
+@PART[arie73]:NEEDS[SystemHeat]
+{
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr
-		systemHeatModuleID = engine
-		
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		name = ModuleSystemHeat
+		// Cubic metres
+		volume = 1.0
+		moduleID = engine
+		iconName = Icon_Engine
 	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[ntr]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[ntr]] {}
+	@MODULE[ModuleSystemHeatEngine],0
+	{
+		@moduleID = ntr1
+		@engineModuleID = Air-augmented
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@moduleID = ntr2
+		@engineModuleID = Standard
+	}
+}
+@PART[opt_vtol_egg|opt_egg]:NEEDS[SystemHeat]
+{
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
+	MODULE
+	{
+		name = ModuleSystemHeat
+		// Cubic metres
+		volume = 1.0
+		moduleID = engine
+		iconName = Icon_Engine
+	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
 }
 @PART[j81turbojet]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
-	MODULE
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	@MODULE[ModuleSystemHeatEngine],0
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = scoop1
-		systemHeatModuleID = engine
-		engineModuleID = AirBreathing
-		systemPower = 600
-		shutdownTemperature = 2000
-		systemOutletTemperature = 1400
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1400 1.0
-			key = 2000 0.0
-		}
+		@moduleID = scoop1
+		@engineModuleID = AirBreathing
 	}
-	MODULE
+	@MODULE[ModuleSystemHeatEngine],1
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = scoop2
-		systemHeatModuleID = engine
-		engineModuleID = ClosedCycle
-		systemPower = 600
-		shutdownTemperature = 2000
-		systemOutletTemperature = 1400
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1400 1.0
-			key = 2000 0.0
-		}
+		@moduleID = scoop2
+		@engineModuleID = ClosedCycle
 	}
 }
 @PART[engine_darkDrive]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[blackhole]] {}
+}
+@PART[opt_vtol_wrapj1]:NEEDS[SystemHeat]
+{
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr
-		systemHeatModuleID = engine
-		
-		systemPower = 1000
-		shutdownTemperature = 2000
-		systemOutletTemperature = 1400
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1400 1.0
-			key = 2000 0.0
-		}
+		name = ModuleSystemHeat
+		// Cubic metres
+		volume = 1.0
+		moduleID = engine
+		iconName = Icon_Engine
+	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[turbojet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	@MODULE[ModuleSystemHeatEngine],0
+	{
+		@engineModuleID = AirBreathing
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@engineModuleID = ClosedCycle
 	}
 }
 @PART[opt_vtol_wrapj2]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	@MODULE[ModuleSystemHeatEngine],0
+	{
+		@moduleID = warpjet1
+		@engineModuleID = WJOpen
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@moduleID = warpjet2
+		@engineModuleID = WJClosed
+	}
+}
+@PART[opt_vtol_wrapk1|opt_vtol_wrapl1]:NEEDS[SystemHeat]
+{
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr
-		systemHeatModuleID = engine
-		
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		name = ModuleSystemHeat
+		// Cubic metres
+		volume = 1.0
+		moduleID = engine
+		iconName = Icon_Engine
+	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[turbojet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	@MODULE[ModuleSystemHeatEngine],0
+	{
+		@engineModuleID = AirBreathing
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@engineModuleID = ClosedCycle
 	}
 }
 @PART[opt_vtol_wrapk2|opt_vtol_wrapl2]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
-	MODULE
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	@MODULE[ModuleSystemHeatEngine],0
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr
-		systemHeatModuleID = engine
-		
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		@moduleID = warpjet1
+		@engineModuleID = WJOpen
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@moduleID = warpjet2
+		@engineModuleID = WJClosed
 	}
 }
+
 @PART[opt_sage]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
-	MODULE
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	@MODULE[ModuleSystemHeatEngine],0
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr
-		systemHeatModuleID = engine
-		
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		@moduleID = warpjet1
+		@engineModuleID = WJOpen
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@moduleID = warpjet2
+		@engineModuleID = WJClosed
 	}
 }
 @PART[opt_surge]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	@MODULE[ModuleSystemHeatEngine],0
+	{
+		@moduleID = warpjet1
+		@engineModuleID = WJOpen
+	}
+}
+@PART[opt_vtol_jumpa1]:NEEDS[SystemHeat]
+{
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr
-		systemHeatModuleID = engine
-		
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		name = ModuleSystemHeat
+		// Cubic metres
+		volume = 1.0
+		moduleID = engine
+		iconName = Icon_Engine
+	}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[turbojet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[scoop]] {}
+	@MODULE[ModuleSystemHeatEngine],0
+	{
+		@engineModuleID = AirBreathing
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@moduleID = warpjet2
+		@engineModuleID = ClosedCycle
 	}
 }
 @PART[opt_vtol_jumpa2]:NEEDS[SystemHeat]
 {
+	@MODULE[ModuleEnginesFX],*
+	{
+		@heatProduction = 0
+	}
 	MODULE
 	{
 		name = ModuleSystemHeat
+		// Cubic metres
 		volume = 1.0
 		moduleID = engine
 		iconName = Icon_Engine
 	}
-	MODULE
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[warpjet]] {}
+	@MODULE[ModuleSystemHeatEngine],0
 	{
-		name = ModuleSystemHeatEngine
-		moduleID = ntr
-		systemHeatModuleID = engine
-		
-		systemPower = 200
-		shutdownTemperature = 1500
-		systemOutletTemperature = 1000
-		temperatureCurve
-		{
-			key = 0 1.0
-			key = 1000 1.0
-			key = 1200 1.1
-			key = 1400 0.0
-		}
+		@moduleID = warpjet1
+		@engineModuleID = WJOpen
+	}
+	@MODULE[ModuleSystemHeatEngine],1
+	{
+		@moduleID = warpjet2
+		@engineModuleID = WJClosed
 	}
 }
 
@@ -747,8 +1019,8 @@
 	{
 		name = ModuleSystemHeat
 		volume = 0.5
-		moduleID = polywell
-		iconName = Icon_Gears
+		moduleID = reactor
+		iconName = Icon_Atom
 	}
 	MODULE
 	{
@@ -758,24 +1030,7 @@
 		iconName = Icon_Radiator
 	}
 	
-	@MODULE[ModuleActiveRadiator]
-	{
-		@name = ModuleSystemHeatRadiator
-		moduleID = radiator
-		systemHeatModuleID = default
-
-		usePhysicalTemperatureModeling = false
-		maxRadiatorTemperature = 350
-		emissivity = 0.9
-
-		temperatureCurve
-		{
-			key = 0 0
-			key = 350 20
-		}
-	}
-	
-	@MODULE[ModuleResourceConverter]
+	@MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies]
 	{
 		@name = ModuleSystemHeatConverter
 		moduleID = converter
@@ -794,11 +1049,79 @@
 		}
 		systemPower
 		{
-			key = 0 120
+			key = 0 500
 		}
 		!ThermalEfficiency  {} 
 		!TemperatureModifier {}
 
 		@GeneratesHeat = false
+	}
+	
+	!MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies] {}
+	#@OPT_SH_PWR/MODULE[FusionReactor]:NEEDS[FarFutureTechnologies] {}
+}
+@PART[opt_powersphere2]:NEEDS[SystemHeat]
+{
+	!MODULE[ModuleCoreHeat] {}
+	!MODULE[ModuleOverheatDisplay] {}
+	MODULE
+	{
+		name = ModuleSystemHeat
+		volume = 3.5
+		moduleID = reactor
+		iconName = Icon_Atom
+	}
+	MODULE
+	{
+		name = ModuleSystemHeat
+		volume = 0.05
+		moduleID = default
+		iconName = Icon_Radiator
+	}
+	
+	@MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies]
+	{
+		@name = ModuleSystemHeatConverter
+		moduleID = converter
+		heatModuleID = polywell
+
+		shutdownTemperature = 2000
+		systemOutletTemperature = 1000
+
+		systemEfficiency
+		{
+			key = 0 0 0 0
+			key = 500 0.2
+			key = 1000 1 0 0
+			key = 1850 0.2
+			key = 3000 0 0 0
+		}
+		systemPower
+		{
+			key = 0 3000
+		}
+		!ThermalEfficiency  {} 
+		!TemperatureModifier {}
+
+		@GeneratesHeat = false
+	}
+	
+	!MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies] {}
+	#@OPT_SH_PWR/MODULE[FusionReactor]:NEEDS[FarFutureTechnologies] {}
+	@MODULE[FusionReactor]:NEEDS[FarFutureTechnologies]
+	{
+		@ChargeRate = 30
+		@ChargeGoal = 5400
+		@SystemPower = 3000
+		// @ShutdownTemperature = 1800
+		// @SystemOutletTemperature = 1000
+		@FUSIONMODE,*
+		{
+			@PowerGeneration *= 6
+			@INPUT_RESOURCE,*
+			{
+				@Ratio *= 6
+			}
+		}
 	}
 }
