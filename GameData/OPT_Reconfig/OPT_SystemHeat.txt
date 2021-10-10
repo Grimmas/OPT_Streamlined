@@ -35,7 +35,7 @@ OPT_SH_PWR:NEEDS[SystemHeat]
 		Charged = false
 		ChargeRate = 10
 		ChargeAmount = 0
-		ChargeGoal = 900
+		ChargeGoal = 1800 // go for 2x the amount of EC that the part produces
 
 		// Animation Parameters
 		// ChargingLightRootTransformName = Lights_Charging
@@ -52,9 +52,9 @@ OPT_SH_PWR:NEEDS[SystemHeat]
 
 		SystemPower = 500
 		// The shutdown temperature of the part
-		ShutdownTemperature = 1800
+		ShutdownTemperature = 2000
 		// The temperature the system contributes to loops
-		SystemOutletTemperature = 1000
+		SystemOutletTemperature = 1600
 
 		FUSIONMODE
 		{
@@ -517,33 +517,6 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 		@engineModuleID = Shcramjet
 	}
 }
-@PART[arie73]:NEEDS[SystemHeat]
-{
-	@MODULE[ModuleEnginesFX],*
-	{
-		@heatProduction = 0
-	}
-	MODULE
-	{
-		name = ModuleSystemHeat
-		// Cubic metres
-		volume = 1.0
-		moduleID = engine
-		iconName = Icon_Engine
-	}
-	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[ntr]] {}
-	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[ntr]] {}
-	@MODULE[ModuleSystemHeatEngine],0
-	{
-		@moduleID = ntr1
-		@engineModuleID = Air-augmented
-	}
-	@MODULE[ModuleSystemHeatEngine],1
-	{
-		@moduleID = ntr2
-		@engineModuleID = Standard
-	}
-}
 @PART[AAengine]:NEEDS[SystemHeat]
 {
 	@MODULE[ModuleEnginesFX],*
@@ -641,6 +614,7 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 		@engineModuleID = ClosedCycle
 	}
 }
+
 @PART[engine_darkDrive]:NEEDS[SystemHeat]
 {
 	@MODULE[ModuleEnginesFX],*
@@ -657,6 +631,23 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 	}
 	#@OPT_SH_ENG/MODULE[ModuleSystemHeatEngine]:HAS[#moduleID[blackhole]] {}
 }
+@PART[engine_darkDrive]:AFTER[SystemHeat]
+{
+	@MODULE[ModuleB9PartSwitch]:HAS[#moduleID[DarkMassInput]]:NEEDS[SystemHeatConverters]
+	{
+		@SUBTYPE,*
+		{
+			@MODULE
+			{
+				@IDENTIFIER[ModuleResourceConverter]
+				{
+					@name = ModuleSystemHeatConverter
+				}
+			}
+		}
+	}
+}
+
 @PART[opt_vtol_wrapj1]:NEEDS[SystemHeat]
 {
 	@MODULE[ModuleEnginesFX],*
@@ -878,62 +869,27 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 	{
 		name = ModuleSystemHeat
 		// Cubic metres
-		volume = 0.5
+		volume = 1
 		moduleID = supercell
-		iconName = Icon_Gears
-	}
-	MODULE
-	{
-		name = ModuleSystemHeat
-		volume = 0.05
-		moduleID = default
-		iconName = Icon_Radiator
+		iconName = Icon_Atom
 	}
 	
-	@MODULE[ModuleActiveRadiator]
-	{
-		@name = ModuleSystemHeatRadiator
-		moduleID = radiator
-		systemHeatModuleID = default
-
-		usePhysicalTemperatureModeling = false
-		maxRadiatorTemperature = 350
-		emissivity = 0.9
-
-		temperatureCurve
-		{
-			key = 0 0
-			key = 350 10
-		}
-	}
-	
-	@MODULE[ModuleResourceConverter]
+	@MODULE[ModuleResourceConverter]:NEEDS[SystemHeatConverters]
 	{
 		@name = ModuleSystemHeatConverter
-		// must be unique
 		moduleID = converter
-		// ModuleSystemHeat moduleID to link to
 		heatModuleID = supercell
 
-		// The shutdown temperature of the part
 		shutdownTemperature = 1000
+		systemOutletTemperature = 800
+		systemPower = 80
 
-		// The temperature the system contributes to loops
-		systemOutletTemperature = 500
-
-		// Map loop temperature to system efficiency (0-1.0)
 		systemEfficiency
 		{
-			key = 0 0 0 0
-			key = 300 0.2
-			key = 500 1 0 0
-			key = 800 0.2
-			key = 1000 0 0 0
-		}
-		// Map system outlet temperature (K) to heat generation (kW)
-		systemPower
-		{
-			key = 0 30
+			key = 0 0.0
+			key = 800 1.0
+			key = 1000 1.0
+			key = 1300 0.0
 		}
 		!ThermalEfficiency  {} 
 		!TemperatureModifier {}
@@ -941,67 +897,55 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 		@GeneratesHeat = false
 	}
 }
-@PART[opt_powersphere1a]:NEEDS[SystemHeat]
+@PART[opt_powersphere1a2]:NEEDS[SystemHeat]
 {
 	!MODULE[ModuleCoreHeat] {}
 	!MODULE[ModuleOverheatDisplay] {}
 	MODULE
 	{
 		name = ModuleSystemHeat
-		volume = 0.5
+		volume = 4
 		moduleID = supercell
-		iconName = Icon_Gears
-	}
-	MODULE
-	{
-		name = ModuleSystemHeat
-		volume = 0.05
-		moduleID = default
-		iconName = Icon_Radiator
+		iconName = Icon_Atom
 	}
 	
-	@MODULE[ModuleActiveRadiator]
-	{
-		@name = ModuleSystemHeatRadiator
-		moduleID = radiator
-		systemHeatModuleID = default
-
-		usePhysicalTemperatureModeling = false
-		maxRadiatorTemperature = 350
-		emissivity = 0.9
-
-		temperatureCurve
-		{
-			key = 0 0
-			key = 350 40
-		}
-	}
-	
-	@MODULE[ModuleResourceConverter]
+	@MODULE[ModuleResourceConverter]:NEEDS[SystemHeatConverters]
 	{
 		@name = ModuleSystemHeatConverter
 		moduleID = converter
 		heatModuleID = supercell
 
 		shutdownTemperature = 1000
-		systemOutletTemperature = 500
+		systemOutletTemperature = 800
+		systemPower = 480
 
 		systemEfficiency
 		{
-			key = 0 0 0 0
-			key = 300 0.2
-			key = 500 1 0 0
-			key = 800 0.2
-			key = 1000 0 0 0
-		}
-		systemPower
-		{
-			key = 0 120
+			key = 0 0.0
+			key = 800 1.0
+			key = 1000 1.0
+			key = 1300 0.0
 		}
 		!ThermalEfficiency  {} 
 		!TemperatureModifier {}
 
 		@GeneratesHeat = false
+	}
+}
+@PART[opt_powersphere1a|opt_powersphere1a2]:AFTER[SystemHeat]
+{
+	@MODULE[ModuleB9PartSwitch]:HAS[#moduleID[FuelSelect]]:NEEDS[SystemHeatConverters]
+	{
+		@SUBTYPE,*
+		{
+			@MODULE
+			{
+				@IDENTIFIER[ModuleResourceConverter]
+				{
+					@name = ModuleSystemHeatConverter
+				}
+			}
+		}
 	}
 }
 
@@ -1018,38 +962,25 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 	MODULE
 	{
 		name = ModuleSystemHeat
-		volume = 0.5
+		volume = 1
 		moduleID = reactor
 		iconName = Icon_Atom
 	}
-	MODULE
-	{
-		name = ModuleSystemHeat
-		volume = 0.05
-		moduleID = default
-		iconName = Icon_Radiator
-	}
 	
-	@MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies]
+	@MODULE[ModuleResourceConverter]:HAS[#ConverterName[Polywell?Fusion]]:NEEDS[!FarFutureTechnologies]
 	{
 		@name = ModuleSystemHeatConverter
 		moduleID = converter
 		heatModuleID = polywell
 
 		shutdownTemperature = 2000
-		systemOutletTemperature = 1000
-
+		systemOutletTemperature = 1600
+		SystemPower = 500
 		systemEfficiency
 		{
-			key = 0 0 0 0
-			key = 500 0.2
-			key = 1000 1 0 0
-			key = 1850 0.2
-			key = 3000 0 0 0
-		}
-		systemPower
-		{
-			key = 0 500
+			key = 0 0
+			key = 1600 1
+			key = 2400 0
 		}
 		!ThermalEfficiency  {} 
 		!TemperatureModifier {}
@@ -1057,7 +988,7 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 		@GeneratesHeat = false
 	}
 	
-	!MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies] {}
+	!MODULE[ModuleResourceConverter]:HAS[#ConverterName[Polywell?Fusion]]:NEEDS[!FarFutureTechnologies] {}
 	#@OPT_SH_PWR/MODULE[FusionReactor]:NEEDS[FarFutureTechnologies] {}
 }
 @PART[opt_powersphere2]:NEEDS[SystemHeat]
@@ -1067,38 +998,25 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 	MODULE
 	{
 		name = ModuleSystemHeat
-		volume = 3.5
+		volume = 4
 		moduleID = reactor
 		iconName = Icon_Atom
 	}
-	MODULE
-	{
-		name = ModuleSystemHeat
-		volume = 0.05
-		moduleID = default
-		iconName = Icon_Radiator
-	}
 	
-	@MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies]
+	@MODULE[ModuleResourceConverter]:HAS[#ConverterName[Polywell?Fusion]]:NEEDS[!FarFutureTechnologies]
 	{
 		@name = ModuleSystemHeatConverter
 		moduleID = converter
 		heatModuleID = polywell
 
 		shutdownTemperature = 2000
-		systemOutletTemperature = 1000
-
+		systemOutletTemperature = 1600
+		SystemPower = 3000
 		systemEfficiency
 		{
-			key = 0 0 0 0
-			key = 500 0.2
-			key = 1000 1 0 0
-			key = 1850 0.2
-			key = 3000 0 0 0
-		}
-		systemPower
-		{
-			key = 0 3000
+			key = 0 0
+			key = 1600 1
+			key = 2400 0
 		}
 		!ThermalEfficiency  {} 
 		!TemperatureModifier {}
@@ -1106,12 +1024,12 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 		@GeneratesHeat = false
 	}
 	
-	!MODULE[ModuleResourceConverter]:NEEDS[!FarFutureTechnologies] {}
+	!MODULE[ModuleResourceConverter]:HAS[#ConverterName[Polywell?Fusion]]:NEEDS[!FarFutureTechnologies] {}
 	#@OPT_SH_PWR/MODULE[FusionReactor]:NEEDS[FarFutureTechnologies] {}
 	@MODULE[FusionReactor]:NEEDS[FarFutureTechnologies]
 	{
 		@ChargeRate = 30
-		@ChargeGoal = 5400
+		@ChargeGoal = 9000
 		@SystemPower = 3000
 		// @ShutdownTemperature = 1800
 		// @SystemOutletTemperature = 1000
@@ -1121,6 +1039,22 @@ OPT_SH_ENG:NEEDS[SystemHeat]
 			@INPUT_RESOURCE,*
 			{
 				@Ratio *= 6
+			}
+		}
+	}
+}
+@PART[opt_powersphere1b|opt_powersphere2]:AFTER[SystemHeat]:NEEDS[FarFutureTechnologies]
+{
+	@MODULE[ModuleB9PartSwitch]:HAS[#moduleID[FuelSelect]]:NEEDS[SystemHeatConverters]
+	{
+		@SUBTYPE,*
+		{
+			@MODULE
+			{
+				@IDENTIFIER[ModuleResourceConverter]
+				{
+					@name = ModuleSystemHeatConverter
+				}
 			}
 		}
 	}
